@@ -16,7 +16,7 @@ Form begin here
 
   constructor(
     private fb: FormBuilder,
-    private routeTo : Router
+    private routeTo: Router
   ) { }
 
   ngOnInit() {
@@ -26,9 +26,6 @@ Form begin here
         Validators.pattern('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$')
       ])),
       Password: [null, Validators.required]
-    });
-    this.rForm.valueChanges.subscribe(data => {
-      console.log(data);
     });
   }
 
