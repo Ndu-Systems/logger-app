@@ -11,6 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     FormsModule,
     ReactiveFormsModule
   ],
+  providers: [],
   declarations: [DashboardComponent]
 })
 export class DashboardModule { }
