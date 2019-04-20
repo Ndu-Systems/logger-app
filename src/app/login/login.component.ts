@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { AuthenticationService } from '../_services';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -8,16 +10,23 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-
-  /*
-Form begin here
-*/
   rForm: FormGroup;
+  loading = false;
+  submitted = false;
+  returnUrl: string;
+  error = '';
 
   constructor(
     private fb: FormBuilder,
-    private routeTo: Router
-  ) { }
+    private routeTo: Router,
+    private route: ActivatedRoute,
+    private authenticationService: AuthenticationService
+  ) {
+    // redirect to dashboard if already logged in.
+    if (this.authenticationService.currentUserValue) {
+      this.routeTo.navigate(['dashboard']);
+    }
+  }
 
   ngOnInit() {
     this.rForm = this.fb.group({
@@ -27,10 +36,32 @@ Form begin here
       ])),
       Password: [null, Validators.required]
     });
+
+    // get return url from route parameters or default to dashboard
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || 'dashboard';
   }
 
-  login(data) {
-    this.routeTo.navigate(['dashboard']);
+  // convinient for easy form(rForm) data access
+  get f() { return this.rForm.controls; }
+
+  login() {
+    this.submitted = true;
+    this.loading = true;
+
+    this.authenticationService
+      .login(this.f.Email.value, this.f.Password.value)
+      .pipe(first())
+      .subscribe(
+        data => {
+          if (data) {
+            this.routeTo.navigate([this.returnUrl]);
+          }
+        },
+        error => {
+          this.error = error;
+          this.loading = false;
+        });
+
   }
 
 }

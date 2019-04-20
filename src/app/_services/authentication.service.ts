@@ -3,14 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../_models';
 import { map } from 'rxjs/operators';
+import { API_URL } from '../_config/config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
   private currentUserSubject: BehaviorSubject<User>;
-  private currentUser: Observable<User>;
-
+  public currentUser: Observable<User>;
+  API = API_URL;
   constructor(
     private http: HttpClient
   ) {
@@ -21,7 +22,7 @@ export class AuthenticationService {
     return this.currentUserSubject.value;
   }
   login(username: string, password: string) {
-    return this.http.post<any>(`${config.apiUrl}/users/authenticate`,
+    return this.http.post<any>(`${this.API}/users/authenticate`,
       { username, password }).pipe(map(user => {
         // login is successfull if there is a JSON Web Token in the response
         if (user && user.token) {
